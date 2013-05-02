@@ -23,8 +23,24 @@ use plumbing::GMainLoop;
 use na;
 use glib;
 
+use core::comm::stream;
+
 pub struct EventLoop {
     priv raw: *GMainLoop
+}
+
+fn run_thread(func: ~fn()) {
+    let mut (port, _) = stream::<task::TaskResult>();
+    task::task()
+        .sched_mode(task::ThreadPerTask)
+        .future_result(|p| {
+            port = p;
+        })
+        .spawn(func);
+    match (port.recv()) {
+        task::Success => {}
+        task::Failure => { fail!(); }
+    }
 }
 
 impl EventLoop {
@@ -35,9 +51,9 @@ impl EventLoop {
     }
 
     pub fn run(&self) {
-        unsafe {
-            na::grustna_main_loop_run_thread_local(self.raw);
-        }
+        run_thread(|| unsafe {
+                na::grustna_main_loop_run_thread_local(self.raw);
+            });
     }
 
     pub fn quit(&self) {
