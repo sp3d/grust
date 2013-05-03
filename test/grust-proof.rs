@@ -160,23 +160,22 @@ fn async() {
 }
 
 #[test]
-#[ignore]  // See https://github.com/mzabaluev/grust/issues/4
 fn async_off_task() {
     do tcase {
-        let fobj = ~gio::File::new_for_path("/dev/null");
-        let el = EventLoop::new();
-        let elo = ~el.clone();
-        do spawn {
-            let f = fobj.interface() as &gio::File;
-            let elo2 = ~elo.clone();
-            f.read_async(0, None, |obj, res| {
+        do grust::eventloop::run_with_init |el| {
+            let fobj = ~gio::File::new_for_path("/dev/null");
+            let elo = ~el.clone();
+            do spawn {
+                let f = fobj.interface() as &gio::File;
+                let elo2 = ~elo.clone();
+                do f.read_async(0, None) |obj, res| {
                     let fifa: &gio::interfaces::File = obj.cast();
                     let f = fifa as &gio::File;
                     f.read_finish(res);
                     elo2.quit();
-                });
+                }
+            }
         }
-        el.run();
     }
 }
 

@@ -26,6 +26,7 @@
 #define G_LOG_DOMAIN "Grust"
 
 #include <glib.h>
+#include <glib-object.h>
 
 #define CALL_MINDER_TIMEOUT (500 * G_TIME_SPAN_MILLISECOND)
 
@@ -330,4 +331,56 @@ grustna_main_loop_run_thread_local (GMainLoop *loop)
   g_main_context_pop_thread_default (context);
 
   g_main_context_release (context);
+}
+
+typedef void (*RustInitCallback)(gpointer data, GMainLoop *loop);
+
+typedef struct _RustInitData RustInitData;
+struct _RustInitData {
+  RustInitCallback callback;
+  gpointer         data;
+};
+
+static gpointer
+grustna_run_thread(gpointer data)
+{
+  RustInitData *init_data = data;
+  GMainLoop *loop;
+  GMainContext *context;
+
+  context = get_rust_thread_context ();
+  loop = g_main_loop_new (context, FALSE);
+
+  g_main_context_push_thread_default (context);
+
+  init_data->callback (init_data->data, loop);
+
+  g_slice_free (RustInitData, data);
+
+  g_main_loop_run (loop);
+
+  g_main_context_pop_thread_default (context);
+
+  g_main_loop_unref (loop);
+  g_main_context_unref (context);
+
+  return NULL;
+}
+
+void
+grustna_run_with_init (RustInitCallback callback, gpointer data)
+{
+  RustInitData *init_data;
+  GThread *thread;
+
+  g_type_init ();
+
+  init_data = g_slice_new (RustInitData);
+  init_data->callback = callback;
+  init_data->data = data;
+
+  thread = g_thread_new ("grust-event-loop",
+                         grustna_run_thread,
+                         init_data);
+  g_thread_unref (thread);
 }

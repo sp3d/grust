@@ -47,6 +47,7 @@ pub extern mod na {
                     context: *GMainContext) -> gboolean;
     fn grustna_main_loop_new_thread_local() -> *GMainLoop;
     fn grustna_main_loop_run_thread_local(l: *GMainLoop);
+    fn grustna_run_with_init(callback: *u8, data: *());
 }
 
 #[link_name="glib-2.0"]
