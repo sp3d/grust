@@ -17,10 +17,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301  USA
  */
-use ffi::*;
+use ffi;
 
+#[fixed_stack_segment]
 pub fn init() {
     unsafe {
-        g_type_init();
+        ffi::g_type_init();
     }
 }

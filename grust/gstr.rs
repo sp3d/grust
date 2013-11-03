@@ -17,7 +17,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301  USA
  */
-use ffi::*;
+
+use ffi;
 use types::*;
 
 use std::libc;
@@ -34,22 +35,25 @@ impl utf8 {
 }
 
 impl Drop for utf8 {
-    fn drop(&self) {
+    #[fixed_stack_segment]
+    fn drop(&mut self) {
         unsafe {
-            g_free(self.data as *());
+            ffi::g_free(self.data as *());
         }
     }
 }
 
 impl Clone for utf8 {
+    #[fixed_stack_segment]
     fn clone(&self) -> utf8 {
         unsafe {
-            utf8::wrap(g_strdup(self.data))
+            utf8::wrap(ffi::g_strdup(self.data))
         }
     }
 }
 
 impl ToStr for utf8 {
+    #[fixed_stack_segment]
     fn to_str(&self) -> ~str {
         unsafe {
             str::raw::from_c_str(self.data)
@@ -58,12 +62,14 @@ impl ToStr for utf8 {
 }
 
 impl Eq for utf8 {
+    #[fixed_stack_segment]
     fn eq(&self, other: &utf8) -> bool {
         unsafe {
             libc::strcmp(self.data, other.data) == 0
         }
     }
 
+    #[fixed_stack_segment]
     fn ne(&self, other: &utf8) -> bool {
         unsafe {
             libc::strcmp(self.data, other.data) != 0
@@ -72,6 +78,7 @@ impl Eq for utf8 {
 }
 
 impl TotalEq for utf8 {
+    #[fixed_stack_segment]
     fn equals(&self, other: &utf8) -> bool {
         unsafe {
             libc::strcmp(self.data, other.data) == 0

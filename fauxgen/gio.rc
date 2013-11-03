@@ -23,6 +23,8 @@
 
 #[crate_type = "lib"];
 
+#[feature(globs)];
+
 extern mod grust (name="grust", vers="0.1");
 extern mod glib (name="grust-GLib", vers="2.0");
 extern mod gobject (name="grust-GObject", vers="2.0");
@@ -62,17 +64,17 @@ pub mod raw {
     }
 
     #[link_name="gio-2.0"]
-    pub extern {
-        fn g_async_result_get_type() -> GType;
-        fn g_file_get_type() -> GType;
-        fn g_file_new_for_path(path: *gchar) -> *GFile;
-        fn g_file_get_path(file: *GFile) -> *gchar;
-        fn g_file_read_async    (file           : *GFile,
+    extern {
+        pub fn g_async_result_get_type() -> GType;
+        pub fn g_file_get_type() -> GType;
+        pub fn g_file_new_for_path(path: *gchar) -> *GFile;
+        pub fn g_file_get_path(file: *GFile) -> *gchar;
+        pub fn g_file_read_async    (file           : *GFile,
                                  io_priority    : libc::c_int,
                                  cancellable    : *GCancellable,
-                                 callback       : *u8,
+                                 callback       : extern "C" fn(*gobject::raw::GObject, *GAsyncResult, *()),
                                  user_data      : *());
-        fn g_file_read_finish   (file   : *GFile,
+        pub fn g_file_read_finish   (file   : *GFile,
                                  res    : *GAsyncResult,
                                  error  : **glib::raw::GError)
                                 -> *GFileInputStream;
@@ -100,6 +102,7 @@ pub type AsyncReadyCallback = ~fn(source_object : &gobject::classes::Object,
                                   res           : &interfaces::AsyncResult);
 
 impl object::ObjectType for raw::GAsyncResult {
+    #[fixed_stack_segment]
     fn get_type() -> object::GType {
         unsafe {
             raw::g_async_result_get_type()
@@ -108,6 +111,7 @@ impl object::ObjectType for raw::GAsyncResult {
 }
 
 impl object::ObjectType for raw::GFile {
+    #[fixed_stack_segment]
     fn get_type() -> object::GType {
         unsafe {
             raw::g_file_get_type()
@@ -151,12 +155,13 @@ pub trait File {
                   -> object::Reference<raw::GFileInputStream>;
 }
 
+#[fixed_stack_segment]
 pub fn file_new_for_path(path: &str) -> object::Reference<raw::GFile> {
     unsafe {
         let mut out: (*plumbing::GMainContext, *raw::GFile)
                      = (ptr::null(), ptr::null());
         do plumbing::call(ptr::null()) |_ctx| {
-            let ret = do str::as_c_str(path) |p| {
+            let ret = do path.with_c_str |p| {
                     raw::g_file_new_for_path(p)
                };
             out = (_ctx, ret);
@@ -168,6 +173,7 @@ pub fn file_new_for_path(path: &str) -> object::Reference<raw::GFile> {
 }
 
 impl File for interfaces::File {
+    #[fixed_stack_segment]
     fn get_path(&self) -> gstr::utf8 {
         unsafe {
             let mut out: *gchar = ptr::null();
@@ -178,6 +184,7 @@ impl File for interfaces::File {
         }
     }
 
+    #[fixed_stack_segment]
     fn read_async(&self,
                   io_priority: int,
                   cancellable: Option<&classes::Cancellable>,
@@ -204,6 +211,7 @@ impl File for interfaces::File {
         }
     }
 
+    #[fixed_stack_segment]
     fn read_finish(&self, res: &interfaces::AsyncResult)
                   -> object::Reference<raw::GFileInputStream> {
         unsafe {

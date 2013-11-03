@@ -63,12 +63,12 @@ impl<T> Reference<T> {
 #[unsafe_destructor]
 impl<T> Drop for Interface<T> {
     /* Non-copyable */
-    fn drop(&self) { }
+    fn drop(&mut self) { }
 }
 
 #[unsafe_destructor]
 impl<T> Drop for Reference<T> {
-    fn drop(&self) {
+    fn drop(&mut self) {
         unsafe {
             self.iface.bare.dec_ref();
         }
@@ -81,12 +81,13 @@ impl<T> Clone for Reference<T> {
     }
 }
 
+#[fixed_stack_segment]
 pub fn cast<'r, T, U: ObjectType>(t: &'r Interface<T>) -> &'r Interface<U> {
     unsafe {
         let inst = t.bare.type_instance();
-        let dest_type = ObjectType::get_type::<U>();
-        if !(ffi::g_type_check_instance_is_a(inst, dest_type) as bool) {
-            fail!(fmt!("invalid cast to type `%s'",
+        let dest_type = /*ObjectType::get_type::<for U>()*/0; /*FIXME: this is wrong*/
+        if (ffi::g_type_check_instance_is_a(inst, dest_type) != 0) {
+            fail!(format!("invalid cast to type `{}'",
                        str::raw::from_c_str(ffi::g_type_name(dest_type))));
         }
         cast::transmute(t)

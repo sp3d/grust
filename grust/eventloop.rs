@@ -26,16 +26,19 @@ pub struct EventLoop {
 }
 
 impl EventLoop {
+    #[fixed_stack_segment]
     pub fn new() -> EventLoop {
         unsafe {
             EventLoop { raw: ffi::grustna_main_loop_new_thread_local() }
         }
     }
 
+    #[fixed_stack_segment]
     pub unsafe fn run(&self) {
         ffi::grustna_main_loop_run_thread_local(self.raw);
     }
 
+    #[fixed_stack_segment]
     pub fn quit(&self) {
         unsafe {
             ffi::g_main_loop_quit(self.raw);
@@ -45,7 +48,8 @@ impl EventLoop {
 
 #[unsafe_destructor]
 impl Drop for EventLoop {
-    fn drop(&self) {
+    #[fixed_stack_segment]
+    fn drop(&mut self) {
         unsafe {
             ffi::g_main_loop_unref(self.raw);
         }
@@ -53,6 +57,7 @@ impl Drop for EventLoop {
 }
 
 impl Clone for EventLoop {
+    #[fixed_stack_segment]
     fn clone(&self) -> EventLoop {
         unsafe {
             ffi::g_main_loop_ref(self.raw);

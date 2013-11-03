@@ -18,10 +18,14 @@
  * 02110-1301  USA
  */
 
+#[feature(globs)];
+
 #[link(name = "grust-GObject", vers = "2.0",
        uuid="252902cd-7b58-41da-9478-c9488841c225")];
 
 #[crate_type = "lib"];
+
+#[feature(globs)];
 
 extern mod grust (name="grust", vers="0.1");
 extern mod glib (name="grust-GLib", vers="2.0");
@@ -43,8 +47,8 @@ pub mod raw {
     }
 
     #[link_name="gobject-2.0"]
-    pub extern {
-        fn g_object_get_type() -> GType;
+    extern {
+        pub fn g_object_get_type() -> GType;
     }
 }
 
@@ -56,6 +60,7 @@ pub mod classes {
 }
 
 impl object::ObjectType for raw::GObject {
+    #[fixed_stack_segment]
     fn get_type() -> object::GType {
         unsafe {
             raw::g_object_get_type()

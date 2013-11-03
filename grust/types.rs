@@ -56,4 +56,4 @@ pub type guint          = libc::c_uint;
 pub type gsize          = libc::size_t;
 
 pub static FALSE: gboolean = 0;
-pub static TRUE:  gboolean = !FALSE;
+pub static TRUE:  gboolean = 1;

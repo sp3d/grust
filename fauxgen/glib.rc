@@ -18,6 +18,8 @@
  * 02110-1301  USA
  */
 
+#[feature(globs)];
+
 #[link(name = "grust-GLib", vers = "2.0",
        uuid="30112a42-d710-4e13-845c-b2d23d73facd")];
 
@@ -37,9 +39,9 @@ pub mod raw {
     }
 
     #[link_name="glib-2.0"]
-    pub extern {
-        pub fn g_free(mem: *());
-        pub fn g_strdup(str: *gchar) -> *gchar;
-        pub fn g_error_free(err: *GError);
+    extern {
+        fn g_free(mem: *());
+        fn g_strdup(str: *gchar) -> *gchar;
+        fn g_error_free(err: *GError);
     }
 }
