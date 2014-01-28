@@ -20,12 +20,11 @@
 
 #[feature(globs)];
 
-#[link(name = "grust-GLib", vers = "2.0",
-       uuid="30112a42-d710-4e13-845c-b2d23d73facd")];
+#[crate_id = "grust-GLib#2.0"];
 
 #[crate_type = "lib"];
 
-extern mod grust (name="grust", vers="0.1");
+extern mod grust = "grust#0.1";
 
 pub mod raw {
     use grust::types::*;

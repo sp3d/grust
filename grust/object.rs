@@ -27,7 +27,7 @@ use std::str;
 
 pub type GType = gsize;
 
-trait ObjectType {
+pub trait ObjectType {
     fn get_type() -> GType;
 }
 
@@ -55,7 +55,7 @@ impl<T> Interface<T> {
 
 impl<T> Reference<T> {
     pub fn interface<'r>(&'r self) -> &'r Interface<T> { &self.iface }
-    pub fn as_interface<U>(&self, f: &fn(&Interface<T>) -> U) -> U {
+    pub fn as_interface<U>(&self, f: |&Interface<T>| -> U) -> U {
         f(&self.iface)
     }
 }
@@ -81,12 +81,11 @@ impl<T> Clone for Reference<T> {
     }
 }
 
-#[fixed_stack_segment]
 pub fn cast<'r, T, U: ObjectType>(t: &'r Interface<T>) -> &'r Interface<U> {
     unsafe {
         let inst = t.bare.type_instance();
         let dest_type = /*ObjectType::get_type::<for U>()*/0; /*FIXME: this is wrong*/
-        if (ffi::g_type_check_instance_is_a(inst, dest_type) != 0) {
+        if ffi::g_type_check_instance_is_a(inst, dest_type) != 0 {
             fail!(format!("invalid cast to type `{}'",
                        str::raw::from_c_str(ffi::g_type_name(dest_type))));
         }

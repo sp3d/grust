@@ -18,8 +18,8 @@
  * 02110-1301  USA
  */
 
-extern mod grust (name="grust", vers="0.1");
-extern mod gio (name="grust-Gio", vers="2.0");
+extern mod grust = "grust#0.1";
+extern mod gio = "grust-Gio#2.0";
 
 use gio::File;
 

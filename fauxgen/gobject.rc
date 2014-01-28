@@ -20,15 +20,12 @@
 
 #[feature(globs)];
 
-#[link(name = "grust-GObject", vers = "2.0",
-       uuid="252902cd-7b58-41da-9478-c9488841c225")];
+#[crate_id = "grust-GObject#2.0"];
 
 #[crate_type = "lib"];
 
-#[feature(globs)];
-
-extern mod grust (name="grust", vers="0.1");
-extern mod glib (name="grust-GLib", vers="2.0");
+extern mod grust = "grust#0.1";
+extern mod glib = "grust-GLib#2.0";
 
 use grust::object;
 
@@ -60,7 +57,6 @@ pub mod classes {
 }
 
 impl object::ObjectType for raw::GObject {
-    #[fixed_stack_segment]
     fn get_type() -> object::GType {
         unsafe {
             raw::g_object_get_type()

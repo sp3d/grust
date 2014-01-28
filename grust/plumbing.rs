@@ -36,7 +36,6 @@ pub unsafe fn get_object(obj: *GObject, ctx: *GMainContext) -> Object {
     Object { raw_obj: obj, context: ctx }
 }
 
-#[fixed_stack_segment]
 pub unsafe fn take_object(obj: *GObject, ctx: *GMainContext) -> Object {
     /*debug!("task %d: taking object %? (ref context %?)",
            *task::get_task(), obj, ctx);*/
@@ -52,7 +51,6 @@ impl Object {
 
     pub unsafe fn context(&self) -> *GMainContext { self.context }
 
-    #[fixed_stack_segment]
     pub unsafe fn inc_ref(&self) {
         /*debug!("task %d: ref object %? (ref context %?)",
                *task::get_task(), self.raw_obj, self.context);*/
@@ -60,7 +58,6 @@ impl Object {
         ffi::g_main_context_ref(self.context);
     }
 
-    #[fixed_stack_segment]
     pub unsafe fn dec_ref(&self) {
         /*debug!("task %d: unref object %? (unref context %?)",
                *task::get_task(), self.raw_obj, self.context);*/
@@ -76,16 +73,15 @@ pub struct CallbackData {
 
 extern fn grust_call_cb(data: *(), ctx: *GMainContext) {
     unsafe {
-        let func = data as *&fn(*GMainContext);
+        let func = data as *|*GMainContext|;
         (*func)(ctx);
     } 
 }
 
-#[fixed_stack_segment]
-pub unsafe fn call(ctx: *GMainContext, func: &fn(*GMainContext)) {
-    if (ffi::grustna_call(grust_call_cb,
+pub unsafe fn call(ctx: *GMainContext, func: |*GMainContext|) {
+    if ffi::grustna_call(grust_call_cb,
                 ptr::to_unsafe_ptr(&func) as *(), ctx)
-         == 0) {
+         == 0 {
         fail!(~"call failure");
     }
 }

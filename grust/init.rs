@@ -19,7 +19,6 @@
  */
 use ffi;
 
-#[fixed_stack_segment]
 pub fn init() {
     unsafe {
         ffi::g_type_init();

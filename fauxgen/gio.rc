@@ -18,16 +18,15 @@
  * 02110-1301  USA
  */
 
-#[link(name = "grust-Gio", vers = "2.0",
-       uuid = "1a020b19-8587-44fe-9b04-c529c27f3c33")];
+#[crate_id = "grust-Gio#2.0"];
 
 #[crate_type = "lib"];
 
 #[feature(globs)];
 
-extern mod grust (name="grust", vers="0.1");
-extern mod glib (name="grust-GLib", vers="2.0");
-extern mod gobject (name="grust-GObject", vers="2.0");
+extern mod grust = "grust#0.1";
+extern mod glib = "grust-GLib#2.0";
+extern mod gobject = "grust-GObject#2.0";
 
 use grust::plumbing;
 use grust::object;
@@ -98,11 +97,10 @@ pub mod interfaces {
     pub type File = object::Interface<raw::GFile>;
 }
 
-pub type AsyncReadyCallback = ~fn(source_object : &gobject::classes::Object,
-                                  res           : &interfaces::AsyncResult);
+pub type AsyncReadyCallback<'a> = 'a |source_object : &'a gobject::classes::Object,
+                                  res           : &'a interfaces::AsyncResult|;
 
 impl object::ObjectType for raw::GAsyncResult {
-    #[fixed_stack_segment]
     fn get_type() -> object::GType {
         unsafe {
             raw::g_async_result_get_type()
@@ -111,7 +109,6 @@ impl object::ObjectType for raw::GAsyncResult {
 }
 
 impl object::ObjectType for raw::GFile {
-    #[fixed_stack_segment]
     fn get_type() -> object::GType {
         unsafe {
             raw::g_file_get_type()
@@ -155,42 +152,39 @@ pub trait File {
                   -> object::Reference<raw::GFileInputStream>;
 }
 
-#[fixed_stack_segment]
 pub fn file_new_for_path(path: &str) -> object::Reference<raw::GFile> {
     unsafe {
         let mut out: (*plumbing::GMainContext, *raw::GFile)
                      = (ptr::null(), ptr::null());
-        do plumbing::call(ptr::null()) |_ctx| {
-            let ret = do path.with_c_str |p| {
+        plumbing::call(ptr::null(), |_ctx| {
+            let ret = path.with_c_str(|p| {
                     raw::g_file_new_for_path(p)
-               };
+               });
             out = (_ctx, ret);
-        };
-        match (out) {
+        });
+        match out {
             (ctx, obj) => object::take_object(obj, ctx)
         }
     }
 }
 
 impl File for interfaces::File {
-    #[fixed_stack_segment]
     fn get_path(&self) -> gstr::utf8 {
         unsafe {
             let mut out: *gchar = ptr::null();
-            do plumbing::call(self.context()) |_ctx| {
+            plumbing::call(self.context(), |_ctx| {
                 out = raw::g_file_get_path(self.raw());
-            };
+            });
             gstr::utf8::wrap(out)
         }
     }
 
-    #[fixed_stack_segment]
     fn read_async(&self,
                   io_priority: int,
                   cancellable: Option<&classes::Cancellable>,
                   callback: AsyncReadyCallback) {
         unsafe {
-            let raw_cancellable: *raw::GCancellable = match (cancellable) {
+            let raw_cancellable: *raw::GCancellable = match cancellable {
                 Some(c) => c.raw(),
                 None    => ptr::null()
             };
@@ -200,18 +194,17 @@ impl File for interfaces::File {
                 };
             let cb_data_raw: *mut plumbing::CallbackData
                              = cast::transmute(cb_data);
-            do plumbing::call(self.context()) |_ctx| {
+            plumbing::call(self.context(), |_ctx| {
                 (*cb_data_raw).context = _ctx;
                 raw::g_file_read_async(self.raw(),
                         io_priority as libc::c_int,
                         raw_cancellable,
                         callbacks::async_ready_callback,
                         cb_data_raw as *());
-            };
+            });
         }
     }
 
-    #[fixed_stack_segment]
     fn read_finish(&self, res: &interfaces::AsyncResult)
                   -> object::Reference<raw::GFileInputStream> {
         unsafe {
@@ -219,13 +212,13 @@ impl File for interfaces::File {
                           *raw::GFileInputStream,
                           *glib::raw::GError)
                          = (ptr::null(), ptr::null(), ptr::null());
-            do plumbing::call(self.context()) |_ctx| {
+            plumbing::call(self.context(), |_ctx| {
                 let error: *glib::raw::GError = ptr::null();
                 let ret = raw::g_file_read_finish(self.raw(),
                         res.raw(), ptr::to_unsafe_ptr(&error));
                 out = (_ctx, ret, error);
-            };
-            match (out) {
+            });
+            match out {
                 (ctx, obj, error) => {
                     if ptr::is_not_null(error) {
                         let msg = str::raw::from_c_str((*error).message);

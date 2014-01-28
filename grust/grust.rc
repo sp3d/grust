@@ -20,8 +20,7 @@
 
 #[feature(globs)];
 
-#[link(name = "grust", vers = "0.1",
-       uuid="e274cf32-7985-40e3-aa18-2dff719ab31d")];
+#[crate_id = "grust#0.1"];
 
 #[crate_type = "lib"];
 
@@ -39,6 +38,7 @@ mod init;
 
 // Reexports into the top level do not work outside of a crate
 // due to https://github.com/mozilla/rust/issues/6745
+pub type gboolean = types::gboolean;
 pub type utf8 = gstr::utf8;
 pub type Object = plumbing::Object;
 pub type Interface<T> = object::Interface<T>;
