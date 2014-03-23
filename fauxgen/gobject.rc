@@ -24,8 +24,8 @@
 
 #[crate_type = "lib"];
 
-extern mod grust = "grust#0.1";
-extern mod glib = "grust-GLib#2.0";
+extern crate grust = "grust#0.1";
+extern crate glib = "grust-GLib#2.0";
 
 use grust::object;
 

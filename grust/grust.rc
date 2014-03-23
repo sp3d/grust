@@ -28,6 +28,8 @@
 #[license = "LGPL 2.1"];
 #[author = "Mikhail Zabaluev"];
 
+#[allow(non_camel_case_types)];
+
 pub mod eventloop;
 pub mod gstr;
 pub mod ffi;

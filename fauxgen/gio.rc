@@ -24,9 +24,9 @@
 
 #[feature(globs)];
 
-extern mod grust = "grust#0.1";
-extern mod glib = "grust-GLib#2.0";
-extern mod gobject = "grust-GObject#2.0";
+extern crate grust = "grust#0.1";
+extern crate glib = "grust-GLib#2.0";
+extern crate gobject = "grust-GObject#2.0";
 
 use grust::plumbing;
 use grust::object;
@@ -122,16 +122,15 @@ mod callbacks {
     use raw;
     use gobject;
     use std::cast;
-    use std::ptr;
 
     pub extern fn async_ready_callback(source_object: *gobject::raw::GObject,
                                        res          : *raw::GAsyncResult,
                                        user_data    : *()) {
         unsafe {
-            assert!(ptr::is_not_null(user_data));
+            assert!(user_data.is_not_null());
             let cd: ~plumbing::CallbackData
                     = cast::transmute(user_data as *plumbing::CallbackData);
-            assert!(ptr::is_not_null(cd.callback));
+            assert!(cd.callback.is_not_null());
             let callback: ~super::AsyncReadyCallback
                           = cast::transmute(cd.callback
                                 as *super::AsyncReadyCallback);
@@ -215,12 +214,12 @@ impl File for interfaces::File {
             plumbing::call(self.context(), |_ctx| {
                 let error: *glib::raw::GError = ptr::null();
                 let ret = raw::g_file_read_finish(self.raw(),
-                        res.raw(), ptr::to_unsafe_ptr(&error));
+                        res.raw(), &error);
                 out = (_ctx, ret, error);
             });
             match out {
                 (ctx, obj, error) => {
-                    if ptr::is_not_null(error) {
+                    if error.is_not_null() {
                         let msg = str::raw::from_c_str((*error).message);
                         glib::raw::g_error_free(error);
                         fail!(msg);

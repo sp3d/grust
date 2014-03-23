@@ -24,7 +24,7 @@
 
 #[crate_type = "lib"];
 
-extern mod grust = "grust#0.1";
+extern crate grust = "grust#0.1";
 
 pub mod raw {
     use grust::types::*;
@@ -39,8 +39,8 @@ pub mod raw {
 
     #[link_name="glib-2.0"]
     extern {
-        fn g_free(mem: *());
-        fn g_strdup(str: *gchar) -> *gchar;
-        fn g_error_free(err: *GError);
+        pub fn g_free(mem: *());
+        pub fn g_strdup(str: *gchar) -> *gchar;
+        pub fn g_error_free(err: *GError);
     }
 }

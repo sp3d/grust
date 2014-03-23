@@ -23,6 +23,7 @@ use types::*;
 
 use std::libc;
 use std::str;
+use std::fmt;
 
 pub struct utf8 {
     priv data: *gchar,
@@ -50,11 +51,9 @@ impl Clone for utf8 {
     }
 }
 
-impl ToStr for utf8 {
-    fn to_str(&self) -> ~str {
-        unsafe {
-            str::raw::from_c_str(self.data)
-        }
+impl fmt::Show for utf8 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.buf.write_str(unsafe {str::raw::c_str_to_static_slice(self.data)})
     }
 }
 

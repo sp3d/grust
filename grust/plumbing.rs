@@ -19,7 +19,6 @@
  */
 use ffi;
 
-use std::ptr;
 //use std::task;
 
 pub struct GMainContext;
@@ -80,7 +79,7 @@ extern fn grust_call_cb(data: *(), ctx: *GMainContext) {
 
 pub unsafe fn call(ctx: *GMainContext, func: |*GMainContext|) {
     if ffi::grustna_call(grust_call_cb,
-                ptr::to_unsafe_ptr(&func) as *(), ctx)
+                &func as *|*GMainContext| as *(), ctx)
          == 0 {
         fail!(~"call failure");
     }
