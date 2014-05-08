@@ -18,11 +18,11 @@
  * 02110-1301  USA
  */
 
-#[feature(globs)];
+#![feature(globs)]
 
-#[crate_id = "grust-GObject#2.0"];
+#![crate_id = "grust-GObject#2.0"]
 
-#[crate_type = "lib"];
+#![crate_type = "lib"]
 
 extern crate grust = "grust#0.1";
 extern crate glib = "grust-GLib#2.0";

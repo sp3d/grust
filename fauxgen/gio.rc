@@ -18,22 +18,23 @@
  * 02110-1301  USA
  */
 
-#[crate_id = "grust-Gio#2.0"];
+#![crate_id = "grust-Gio#2.0"]
 
-#[crate_type = "lib"];
+#![crate_type = "lib"]
 
-#[feature(globs)];
+#![feature(globs)]
 
 extern crate grust = "grust#0.1";
 extern crate glib = "grust-GLib#2.0";
 extern crate gobject = "grust-GObject#2.0";
+
+extern crate libc;
 
 use grust::plumbing;
 use grust::object;
 use grust::types::*;
 use grust::gstr;
 use std::cast;
-use std::libc;
 use std::ptr;
 use std::str;
 
@@ -42,24 +43,24 @@ pub mod raw {
     use grust::object::GType;
     use glib;
     use gobject;
-    use std::libc;
+    use libc;
 
     pub struct GAsyncResult;
     pub struct GFile;
 
     pub struct GCancellable {
-        parent_instance: gobject::raw::GObject,
-        priv _priv: *()
+        pub parent_instance: gobject::raw::GObject,
+        _priv: *()
     }
 
     pub struct GInputStream {
-        parent_instance: gobject::raw::GObject,
-        priv _priv: *()
+        pub parent_instance: gobject::raw::GObject,
+        _priv: *()
     }
 
     pub struct GFileInputStream {
-        parent_instance: GInputStream,
-        priv _priv: *()
+        pub parent_instance: GInputStream,
+        _priv: *()
     }
 
     #[link_name="gio-2.0"]
@@ -97,8 +98,8 @@ pub mod interfaces {
     pub type File = object::Interface<raw::GFile>;
 }
 
-pub type AsyncReadyCallback<'a> = 'a |source_object : &'a gobject::classes::Object,
-                                  res           : &'a interfaces::AsyncResult|;
+pub type AsyncReadyCallback<'a> = |source_object : &'a gobject::classes::Object,
+                                  res           : &'a interfaces::AsyncResult|:'a;
 
 impl object::ObjectType for raw::GAsyncResult {
     fn get_type() -> object::GType {

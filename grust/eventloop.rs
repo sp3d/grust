@@ -22,7 +22,7 @@ use ffi;
 use plumbing::GMainLoop;
 
 pub struct EventLoop {
-    priv raw: *GMainLoop
+    raw: *GMainLoop
 }
 
 impl EventLoop {

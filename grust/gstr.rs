@@ -18,15 +18,16 @@
  * 02110-1301  USA
  */
 
+extern crate libc;
 use ffi;
 use types::*;
 
-use std::libc;
 use std::str;
 use std::fmt;
 
+#[deriving(TotalEq)]
 pub struct utf8 {
-    priv data: *gchar,
+    data: *gchar,
 }
 
 impl utf8 {
@@ -67,14 +68,6 @@ impl Eq for utf8 {
     fn ne(&self, other: &utf8) -> bool {
         unsafe {
             libc::strcmp(self.data, other.data) != 0
-        }
-    }
-}
-
-impl TotalEq for utf8 {
-    fn equals(&self, other: &utf8) -> bool {
-        unsafe {
-            libc::strcmp(self.data, other.data) == 0
         }
     }
 }

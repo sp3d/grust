@@ -18,17 +18,17 @@
  * 02110-1301  USA
  */
 
-#[feature(globs)];
+#![feature(globs)]
 
-#[crate_id = "grust#0.1"];
+#![crate_id = "grust#0.1"]
 
-#[crate_type = "lib"];
+#![crate_type = "lib"]
 
-#[desc = "GObject introspection bindings"];
-#[license = "LGPL 2.1"];
-#[author = "Mikhail Zabaluev"];
+#![desc = "GObject introspection bindings"]
+#![license = "LGPL 2.1"]
+#![author = "Mikhail Zabaluev"]
 
-#[allow(non_camel_case_types)];
+#![allow(non_camel_case_types)]
 
 pub mod eventloop;
 pub mod gstr;

@@ -27,8 +27,8 @@ pub struct GObject;
 pub struct GTypeInstance;
 
 pub struct Object {
-    priv raw_obj: *GObject,
-    priv context: *GMainContext
+    raw_obj: *GObject,
+    context: *GMainContext
 }
 
 pub unsafe fn get_object(obj: *GObject, ctx: *GMainContext) -> Object {
@@ -66,8 +66,8 @@ impl Object {
 }
 
 pub struct CallbackData {
-    callback: *(),
-    context: *GMainContext
+    pub callback: *(),
+    pub context: *GMainContext
 }
 
 extern fn grust_call_cb(data: *(), ctx: *GMainContext) {
@@ -81,6 +81,6 @@ pub unsafe fn call(ctx: *GMainContext, func: |*GMainContext|) {
     if ffi::grustna_call(grust_call_cb,
                 &func as *|*GMainContext| as *(), ctx)
          == 0 {
-        fail!(~"call failure");
+        fail!("call failure");
     }
 }

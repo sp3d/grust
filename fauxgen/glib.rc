@@ -18,11 +18,11 @@
  * 02110-1301  USA
  */
 
-#[feature(globs)];
+#![feature(globs)]
 
-#[crate_id = "grust-GLib#2.0"];
+#![crate_id = "grust-GLib#2.0"]
 
-#[crate_type = "lib"];
+#![crate_type = "lib"]
 
 extern crate grust = "grust#0.1";
 
@@ -32,9 +32,9 @@ pub mod raw {
     pub type GQuark = u32;
 
     pub struct GError {
-        domain: GQuark,
-        code: gint,
-        message: *gchar
+        pub domain: GQuark,
+        pub code: gint,
+        pub message: *gchar
     }
 
     #[link_name="glib-2.0"]

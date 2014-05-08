@@ -32,11 +32,11 @@ pub trait ObjectType {
 }
 
 pub struct Interface<T> {
-    priv bare: plumbing::Object
+    bare: plumbing::Object
 }
 
 pub struct Reference<T> {
-    priv iface: Interface<T>
+    iface: Interface<T>
 }
 
 impl<T> Interface<T> {
