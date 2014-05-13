@@ -34,7 +34,7 @@ use grust::plumbing;
 use grust::object;
 use grust::types::*;
 use grust::gstr;
-use std::cast;
+use std::mem;
 use std::ptr;
 use std::str;
 
@@ -122,18 +122,18 @@ mod callbacks {
     use grust::object;
     use raw;
     use gobject;
-    use std::cast;
+    use std::mem;
 
     pub extern fn async_ready_callback(source_object: *gobject::raw::GObject,
                                        res          : *raw::GAsyncResult,
                                        user_data    : *()) {
         unsafe {
             assert!(user_data.is_not_null());
-            let cd: ~plumbing::CallbackData
-                    = cast::transmute(user_data as *plumbing::CallbackData);
+            let cd: Box<plumbing::CallbackData>
+                    = mem::transmute(user_data as *plumbing::CallbackData);
             assert!(cd.callback.is_not_null());
-            let callback: ~super::AsyncReadyCallback
-                          = cast::transmute(cd.callback
+            let callback: Box<super::AsyncReadyCallback>
+                          = mem::transmute(cd.callback
                                 as *super::AsyncReadyCallback);
             let arg1 = object::make_interface(source_object, cd.context);
             let arg2 = object::make_interface(res, cd.context);
@@ -188,12 +188,12 @@ impl File for interfaces::File {
                 Some(c) => c.raw(),
                 None    => ptr::null()
             };
-            let cb_data = ~plumbing::CallbackData {
-                    callback: cast::transmute(~callback),
+            let cb_data = box plumbing::CallbackData {
+                    callback: mem::transmute(box callback),
                     context: ptr::null()
                 };
             let cb_data_raw: *mut plumbing::CallbackData
-                             = cast::transmute(cb_data);
+                             = mem::transmute(cb_data);
             plumbing::call(self.context(), |_ctx| {
                 (*cb_data_raw).context = _ctx;
                 raw::g_file_read_async(self.raw(),

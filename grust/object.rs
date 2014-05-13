@@ -22,7 +22,7 @@ use plumbing;
 use plumbing::{GObject,GMainContext};
 use types::*;
 
-use std::cast;
+use std::mem;
 use std::str;
 
 pub type GType = gsize;
@@ -89,7 +89,7 @@ pub fn cast<'r, T, U: ObjectType>(t: &'r Interface<T>) -> &'r Interface<U> {
             fail!(format!("invalid cast to type `{}'",
                        str::raw::from_c_str(ffi::g_type_name(dest_type))));
         }
-        cast::transmute(t)
+        mem::transmute(t)
     }
 }
 
